@@ -1,0 +1,966 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#123d2a">
+<title>GREEN MILE | Smart Irrigation</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --green: #176b43;
+  --dark: #123d2a;
+  --light-green: #e7f5ec;
+  --blue: #2589c7;
+  --background: #f4f7f4;
+  --white: #ffffff;
+  --text: #172b20;
+  --muted: #718078;
+  --border: #e4ebe5;
+  --red: #d94b4b;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--background);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+header {
+  background: var(--dark);
+  color: white;
+  padding: 20px 6%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-icon {
+  width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #267b4c;
+  font-size: 25px;
+}
+
+.brand h1 {
+  font-size: 22px;
+  letter-spacing: 1px;
+}
+
+.brand p {
+  color: #b9d7c4;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.connection {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  color: #d5e8dc;
+}
+
+.dot {
+  height: 9px;
+  width: 9px;
+  border-radius: 50%;
+  background: #e5ad40;
+}
+
+.dot.online {
+  background: #45d483;
+}
+
+.dot.offline {
+  background: #ef6565;
+}
+
+main {
+  max-width: 1200px;
+  margin: 35px auto;
+  padding: 0 20px;
+}
+
+.heading {
+  margin-bottom: 25px;
+}
+
+.heading h2 {
+  font-size: 27px;
+  margin-bottom: 8px;
+}
+
+.heading p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(20, 50, 30, .035);
+}
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.card-label {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.card-icon {
+  width: 43px;
+  height: 43px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+}
+
+.soil-icon {
+  background: #e8f5eb;
+}
+
+.water-icon {
+  background: #e7f3fc;
+}
+
+.metric {
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.metric small {
+  color: var(--muted);
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.description {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.progress {
+  height: 9px;
+  margin-top: 19px;
+  background: #edf1ed;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: 20px;
+  background: var(--green);
+  transition: width .4s;
+}
+
+.water-fill {
+  background: var(--blue);
+}
+
+.pump-card {
+  grid-column: 1 / -1;
+}
+
+.pump-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.pump-state {
+  font-size: 31px;
+  font-weight: 700;
+  margin: 9px 0;
+}
+
+.pump-state.on {
+  color: var(--green);
+}
+
+.pump-state.off {
+  color: var(--red);
+}
+
+.pump-description {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.toggle {
+  border: none;
+  padding: 15px 25px;
+  min-width: 155px;
+  border-radius: 10px;
+  background: var(--green);
+  color: white;
+  font-weight: 700;
+  transition: .2s;
+}
+
+.toggle.off {
+  background: #26372d;
+}
+
+.toggle:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.notice {
+  margin-top: 17px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.section {
+  margin-top: 24px;
+}
+
+.section h3 {
+  font-size: 17px;
+  margin-bottom: 17px;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  min-width: 480px;
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: left;
+  padding: 15px 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+
+th {
+  color: var(--muted);
+}
+
+.empty {
+  color: var(--muted);
+  text-align: center;
+  padding: 25px;
+}
+
+.system-info {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.info-item {
+  padding: 15px;
+  border-radius: 10px;
+  background: #f7faf7;
+}
+
+.info-item span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+
+.info-item strong {
+  font-size: 14px;
+}
+
+.message {
+  font-size: 13px;
+  margin-top: 12px;
+  color: var(--muted);
+}
+
+footer {
+  text-align: center;
+  padding: 30px 15px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+@media(max-width: 650px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pump-card {
+    grid-column: auto;
+  }
+
+  .heading h2 {
+    font-size: 23px;
+  }
+
+  .metric {
+    font-size: 35px;
+  }
+
+  .system-info {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">
+    <div class="brand-icon">🌱</div>
+    <div>
+      <h1>GREEN MILE</h1>
+      <p>Smart Irrigation System</p>
+    </div>
+  </div>
+
+  <div class="connection">
+    <span class="dot" id="deviceDot"></span>
+    <span id="deviceStatus">Checking device...</span>
+  </div>
+</header>
+
+<main>
+
+  <div class="heading">
+    <h2>Farm Overview</h2>
+    <p>Monitor your irrigation system and manage your water pump.</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- SOIL MOISTURE -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-label">Soil Moisture</div>
+        <div class="card-icon soil-icon">🌱</div>
+      </div>
+
+      <div class="metric">
+        <span id="soilValue">--</span><small>%</small>
+      </div>
+
+      <div class="description" id="soilDescription">
+        Waiting for sensor data
+      </div>
+
+      <div class="progress">
+        <div class="progress-fill" id="soilProgress"></div>
+      </div>
+    </div>
+
+    <!-- WATER LEVEL -->
+    <div class="card">
+      <div class="card-top">
+        <div class="card-label">Water Tank Level</div>
+        <div class="card-icon water-icon">💧</div>
+      </div>
+
+      <div class="metric">
+        <span id="waterValue">--</span><small>%</small>
+      </div>
+
+      <div class="description" id="waterDescription">
+        Waiting for sensor data
+      </div>
+
+      <div class="progress">
+        <div class="progress-fill water-fill" id="waterProgress"></div>
+      </div>
+    </div>
+
+    <!-- PUMP -->
+    <div class="card pump-card">
+
+      <div class="card-top">
+        <div>
+          <div class="card-label">Water Pump Control</div>
+
+          <div class="pump-state off" id="pumpState">
+            OFF
+          </div>
+
+          <div class="pump-description" id="pumpDescription">
+            Waiting for pump status
+          </div>
+        </div>
+
+        <div class="card-icon soil-icon">⚙️</div>
+      </div>
+
+      <div class="pump-content">
+        <div>
+          <strong>Remote pump operation</strong>
+          <div class="notice">
+            Control your irrigation pump remotely through Supabase.
+          </div>
+        </div>
+
+        <button class="toggle off" id="pumpToggle" disabled>
+          TURN PUMP ON
+        </button>
+      </div>
+
+      <div class="message" id="pumpMessage">
+        Connecting to backend...
+      </div>
+
+      <div class="notice">
+        The ESP32 must be online to receive commands. Firmware
+        safety limits remain active.
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- DEVICE INFORMATION -->
+  <div class="card section">
+    <h3>System Information</h3>
+
+    <div class="system-info">
+      <div class="info-item">
+        <span>ESP32 connection</span>
+        <strong id="deviceInfo">Checking...</strong>
+      </div>
+
+      <div class="info-item">
+        <span>Last sensor update</span>
+        <strong id="lastUpdate">No readings yet</strong>
+      </div>
+
+      <div class="info-item">
+        <span>Backend connection</span>
+        <strong id="backendStatus">Connecting...</strong>
+      </div>
+
+      <div class="info-item">
+        <span>Pump command</span>
+        <strong id="commandStatus">Unknown</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="card section">
+    <h3>Recent Sensor Readings</h3>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Soil Moisture</th>
+            <th>Water Level</th>
+            <th>Pump</th>
+          </tr>
+        </thead>
+
+        <tbody id="historyBody">
+          <tr>
+            <td colspan="4" class="empty">
+              Waiting for readings...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  GREEN MILE · Smart Agriculture Monitoring
+</footer>
+
+<script>
+/* =====================================
+   1. SUPABASE CONFIGURATION
+===================================== */
+
+const SUPABASE_URL = "https://zjebodmbvpjspuofdfbk.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqZWJvZG1idnBqc3B1b2ZkZmJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NDgyMjcsImV4cCI6MjExMTEyNDIyN30.4hBQaKSbQ0cHYa7QW_Dkd1ehr3vgFeygrsTvWIlbT8w";
+
+let db = null;
+let backendReady = false;
+let pumpCommand = false;
+let actualPumpState = false;
+let deviceOnline = false;
+let latestReadingTime = null;
+let busy = false;
+
+/* =====================================
+   2. HTML ELEMENTS
+===================================== */
+
+const pumpToggle = document.getElementById("pumpToggle");
+
+function setText(id, value) {
+  document.getElementById(id).textContent = value;
+}
+
+/* =====================================
+   3. CONNECTION STATUS
+===================================== */
+
+function setDeviceStatus(online) {
+  deviceOnline = online;
+
+  const dot = document.getElementById("deviceDot");
+
+  dot.className = online ? "dot online" : "dot offline";
+
+  setText(
+    "deviceStatus",
+    online ? "ESP32 Online" : "ESP32 Offline"
+  );
+
+  setText(
+    "deviceInfo",
+    online ? "Connected" : "Disconnected"
+  );
+
+  updatePumpButton();
+}
+
+function checkDeviceStatus() {
+  if (!latestReadingTime) {
+    setDeviceStatus(false);
+    return;
+  }
+
+  const age = Date.now() - latestReadingTime;
+
+  // ESP32 uploads every 10 seconds.
+  setDeviceStatus(age < 30000);
+}
+
+/* =====================================
+   4. SENSOR DASHBOARD
+===================================== */
+
+function updateDashboard(reading) {
+
+  const soil = Number(reading.soil_pct);
+  const water = Number(reading.water_pct);
+
+  if (reading.soil_pct !== null &&
+      Number.isFinite(soil)) {
+
+    const value = Math.max(0, Math.min(100, soil));
+
+    setText("soilValue", value);
+    document.getElementById("soilProgress").style.width =
+      value + "%";
+
+    setText(
+      "soilDescription",
+      value < 30 ? "Low soil moisture" :
+      value < 70 ? "Moderate soil moisture" :
+      "High soil moisture"
+    );
+  }
+
+  if (reading.water_pct !== null &&
+      Number.isFinite(water)) {
+
+    const value = Math.max(0, Math.min(100, water));
+
+    setText("waterValue", value);
+    document.getElementById("waterProgress").style.width =
+      value + "%";
+
+    setText(
+      "waterDescription",
+      value < 20 ? "Low tank water level" :
+      value < 70 ? "Moderate tank water level" :
+      "Sufficient tank water"
+    );
+  }
+
+  if (typeof reading.pump_on === "boolean") {
+    actualPumpState = reading.pump_on;
+    updatePumpDisplay();
+  }
+
+  if (reading.created_at) {
+    latestReadingTime = new Date(reading.created_at).getTime();
+
+    setText(
+      "lastUpdate",
+      new Date(latestReadingTime).toLocaleString()
+    );
+  }
+
+  checkDeviceStatus();
+}
+
+function updatePumpDisplay() {
+
+  const state = document.getElementById("pumpState");
+
+  state.textContent = actualPumpState ? "ON" : "OFF";
+
+  state.className = actualPumpState
+    ? "pump-state on"
+    : "pump-state off";
+
+  setText(
+    "pumpDescription",
+    actualPumpState
+      ? "Pump is running."
+      : "Pump is switched off."
+  );
+}
+
+/* =====================================
+   5. LOAD LATEST READING
+===================================== */
+
+async function loadLatestReading() {
+
+  const { data, error } = await db
+    .from("readings")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  if (error) {
+    console.error("Readings:", error.message);
+    return;
+  }
+
+  if (data && data.length > 0) {
+    updateDashboard(data[0]);
+  } else {
+    setDeviceStatus(false);
+  }
+}
+
+/* =====================================
+   6. LOAD HISTORY
+===================================== */
+
+async function loadHistory() {
+
+  const { data, error } = await db
+    .from("readings")
+    .select("created_at,soil_pct,water_pct,pump_on")
+    .order("created_at", { ascending: false })
+    .limit(15);
+
+  if (error) {
+    console.error("History:", error.message);
+    return;
+  }
+
+  const body = document.getElementById("historyBody");
+
+  if (!data || data.length === 0) {
+    body.innerHTML =
+      '<tr><td colspan="4" class="empty">No readings available.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = data.map(row => {
+
+    const time = new Date(row.created_at).toLocaleString();
+
+    return `
+      <tr>
+        <td>${time}</td>
+        <td>${row.soil_pct ?? "--"}%</td>
+        <td>${row.water_pct ?? "--"}%</td>
+        <td>${row.pump_on === true ? "ON" :
+             row.pump_on === false ? "OFF" : "--"}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+/* =====================================
+   7. LOAD PUMP COMMAND
+===================================== */
+
+async function loadPumpCommand() {
+
+  const { data, error } = await db
+    .from("pump_control")
+    .select("mode,manual_state")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (error) {
+    setText("pumpMessage", "Could not read pump command.");
+    console.error(error.message);
+    return;
+  }
+
+  if (!data) {
+    setText("pumpMessage", "Pump control record is missing.");
+    return;
+  }
+
+  pumpCommand =
+    data.mode === "manual" &&
+    data.manual_state === true;
+
+  updatePumpButton();
+  setText("commandStatus", pumpCommand ? "ON requested" : "OFF requested");
+}
+
+/* =====================================
+   8. PUMP TOGGLE
+===================================== */
+
+pumpToggle.addEventListener("click", async () => {
+
+  if (!backendReady || !deviceOnline || busy) return;
+
+  const nextState = !pumpCommand;
+
+  // Prevent starting a new pump run if the tank is
+  // reporting a very low water level.
+  const water = Number(document.getElementById("waterValue").textContent);
+
+  if (nextState && (!Number.isFinite(water) || water < 20)) {
+    setText(
+      "pumpMessage",
+      "Pump start blocked: water level is low or unavailable."
+    );
+    return;
+  }
+
+  busy = true;
+  pumpToggle.disabled = true;
+  pumpToggle.textContent = "SENDING...";
+
+  setText("pumpMessage", "Sending command to ESP32...");
+
+  const { error } = await db
+    .from("pump_control")
+    .update({
+      mode: "manual",
+      manual_state: nextState,
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", 1);
+
+  busy = false;
+
+  if (error) {
+    setText("pumpMessage", "Command failed: " + error.message);
+    updatePumpButton();
+    return;
+  }
+
+  pumpCommand = nextState;
+
+  setText(
+    "commandStatus",
+    nextState ? "ON requested" : "OFF requested"
+  );
+
+  setText(
+    "pumpMessage",
+    "Command saved. Waiting for ESP32 confirmation."
+  );
+
+  updatePumpButton();
+});
+
+function updatePumpButton() {
+
+  // The button is enabled only if backend and device
+  // are connected and no request is in progress.
+  pumpToggle.disabled =
+    !backendReady || !deviceOnline || busy;
+
+  pumpToggle.textContent =
+    pumpCommand ? "TURN PUMP OFF" : "TURN PUMP ON";
+
+  pumpToggle.className =
+    pumpCommand ? "toggle" : "toggle off";
+}
+
+/* =====================================
+   9. REALTIME SENSOR UPDATES
+===================================== */
+
+function subscribeToReadings() {
+
+  db
+    .channel("green-mile-readings")
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "readings"
+      },
+      async (payload) => {
+        updateDashboard(payload.new);
+        await loadHistory();
+      }
+    )
+    .subscribe();
+}
+
+/* =====================================
+   10. REALTIME PUMP COMMAND UPDATES
+===================================== */
+
+function subscribeToPumpControl() {
+
+  db
+    .channel("green-mile-pump")
+    .on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "pump_control",
+        filter: "id=eq.1"
+      },
+      (payload) => {
+
+        pumpCommand =
+          payload.new.mode === "manual" &&
+          payload.new.manual_state === true;
+
+        updatePumpButton();
+
+        setText(
+          "commandStatus",
+          pumpCommand ? "ON requested" : "OFF requested"
+        );
+      }
+    )
+    .subscribe();
+}
+
+/* =====================================
+   11. INITIALIZE SUPABASE
+===================================== */
+
+async function initialize() {
+
+  const validConfig =
+    SUPABASE_URL.startsWith("https://") &&
+    !SUPABASE_URL.includes("YOUR_SUPABASE") &&
+    SUPABASE_ANON_KEY.length > 20 &&
+    !SUPABASE_ANON_KEY.includes("YOUR_SUPABASE");
+
+  if (!validConfig) {
+    setText("backendStatus", "Not configured");
+    setText("pumpMessage", "Add your Supabase project URL and key.");
+    setDeviceStatus(false);
+    return;
+  }
+
+  if (!window.supabase) {
+    setText("backendStatus", "Supabase library unavailable");
+    setText("pumpMessage", "Check your internet connection and reload.");
+    return;
+  }
+
+  db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+  try {
+
+    const { error } = await db
+      .from("readings")
+      .select("id")
+      .limit(1);
+
+    if (error) throw error;
+
+    backendReady = true;
+
+    setText("backendStatus", "Connected");
+
+    await loadLatestReading();
+    await loadHistory();
+    await loadPumpCommand();
+
+    subscribeToReadings();
+    subscribeToPumpControl();
+
+    setInterval(checkDeviceStatus, 5000);
+
+  } catch (error) {
+
+    backendReady = false;
+
+    setText("backendStatus", "Connection failed");
+    setText("pumpMessage", error.message);
+
+    setDeviceStatus(false);
+
+    console.error("Supabase connection:", error);
+  }
+}
+
+initialize();
+
+</script>
+
+</body>
+</html>
