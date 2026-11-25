@@ -36,8 +36,11 @@ body {
   min-height: 100vh;
 }
 
-button {
+button, input, select {
   font: inherit;
+}
+
+button {
   cursor: pointer;
 }
 
@@ -249,7 +252,8 @@ main {
   background: #26372d;
 }
 
-.toggle:disabled {
+.toggle:disabled,
+.save-btn:disabled {
   opacity: .45;
   cursor: not-allowed;
 }
@@ -326,6 +330,106 @@ th {
   color: var(--muted);
 }
 
+/* FARM PROFILE */
+
+.profile-intro {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+  margin-bottom: 22px;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group.full {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  outline: none;
+  background: #fff;
+  color: var(--text);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(23,107,67,.08);
+}
+
+.form-help {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+
+.save-btn {
+  border: none;
+  background: var(--green);
+  color: white;
+  padding: 14px 24px;
+  border-radius: 9px;
+  font-weight: 700;
+}
+
+.save-btn:hover {
+  background: #105735;
+}
+
+.profile-status {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.profile-status.success {
+  color: var(--green);
+}
+
+.profile-status.error {
+  color: var(--red);
+}
+
+.profile-summary {
+  display: none;
+  margin-top: 22px;
+  padding: 16px;
+  border-radius: 10px;
+  background: var(--light-green);
+  line-height: 1.7;
+}
+
+.profile-summary strong {
+  color: var(--dark);
+}
+
 footer {
   text-align: center;
   padding: 30px 15px;
@@ -350,8 +454,22 @@ footer {
     font-size: 35px;
   }
 
-  .system-info {
+  .system-info,
+  .profile-grid {
     grid-template-columns: 1fr;
+  }
+
+  .form-group.full {
+    grid-column: auto;
+  }
+
+  .profile-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .save-btn {
+    width: 100%;
   }
 }
 </style>
@@ -463,7 +581,6 @@ footer {
         The ESP32 must be online to receive commands. Firmware
         safety limits remain active.
       </div>
-
     </div>
 
   </div>
@@ -493,6 +610,147 @@ footer {
         <strong id="commandStatus">Unknown</strong>
       </div>
     </div>
+  </div>
+
+  <!-- FARMER CROP PROFILE -->
+  <div class="card section">
+
+    <h3>🌾 Farm Crop Profile</h3>
+
+    <p class="profile-intro">
+      Provide information about the crop you are cultivating.
+      This information will help GREEN MILE generate more relevant
+      crop monitoring insights and irrigation recommendations.
+    </p>
+
+    <form id="farmProfileForm">
+
+      <div class="profile-grid">
+
+        <div class="form-group">
+          <label for="cropName">Crop Name *</label>
+
+          <input
+            type="text"
+            id="cropName"
+            list="cropSuggestions"
+            placeholder="e.g. Maize, Tomato, Pepper"
+            maxlength="100"
+            required
+          >
+
+          <datalist id="cropSuggestions">
+            <option value="Maize">
+            <option value="Tomato">
+            <option value="Cassava">
+            <option value="Pepper">
+            <option value="Rice">
+            <option value="Onion">
+            <option value="Okra">
+            <option value="Cabbage">
+            <option value="Cucumber">
+            <option value="Plantain">
+            <option value="Yam">
+            <option value="Groundnut">
+          </datalist>
+        </div>
+
+        <div class="form-group">
+          <label for="growthStage">Growth Stage *</label>
+
+          <select id="growthStage" required>
+            <option value="">Select growth stage</option>
+            <option value="Land preparation">Land preparation</option>
+            <option value="Planting">Planting</option>
+            <option value="Germination">Germination</option>
+            <option value="Seedling">Seedling</option>
+            <option value="Vegetative growth">Vegetative growth</option>
+            <option value="Flowering">Flowering</option>
+            <option value="Fruiting">Fruiting</option>
+            <option value="Maturity">Maturity</option>
+            <option value="Harvesting">Harvesting</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="soilType">Soil Type *</label>
+
+          <select id="soilType" required>
+            <option value="">Select soil type</option>
+            <option value="Sandy soil">Sandy soil</option>
+            <option value="Clay soil">Clay soil</option>
+            <option value="Loamy soil">Loamy soil</option>
+            <option value="Silt soil">Silt soil</option>
+            <option value="Sandy loam">Sandy loam</option>
+            <option value="Clay loam">Clay loam</option>
+            <option value="Other">Other / Unknown</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="farmLocation">Farm Location</label>
+
+          <input
+            type="text"
+            id="farmLocation"
+            placeholder="e.g. Kumasi, Ashanti Region"
+            maxlength="150"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="farmSize">Farm Size</label>
+
+          <input
+            type="number"
+            id="farmSize"
+            min="0"
+            step="0.01"
+            placeholder="e.g. 2.5"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="farmSizeUnit">Farm Size Unit</label>
+
+          <select id="farmSizeUnit">
+            <option value="acres">Acres</option>
+            <option value="hectares">Hectares</option>
+            <option value="square meters">Square meters</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="profile-actions">
+
+        <button
+          type="submit"
+          class="save-btn"
+          id="saveProfileBtn"
+          disabled
+        >
+          SAVE CROP PROFILE
+        </button>
+
+        <div class="profile-status" id="profileStatus">
+          Connecting to farm profile...
+        </div>
+
+      </div>
+
+    </form>
+
+    <div class="profile-summary" id="profileSummary">
+      <strong>Saved Farm Profile</strong>
+      <div id="profileSummaryText"></div>
+    </div>
+
+    <div class="notice">
+      This is currently a shared farm profile. Individual farmer
+      profiles will be introduced when the login system is added.
+    </div>
+
   </div>
 
   <!-- HISTORY -->
@@ -528,12 +786,16 @@ footer {
 </footer>
 
 <script>
+
 /* =====================================
    1. SUPABASE CONFIGURATION
 ===================================== */
 
-const SUPABASE_URL = "https://zjebodmbvpjspuofdfbk.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpqZWJvZG1idnBqc3B1b2ZkZmJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NDgyMjcsImV4cCI6MjExMTEyNDIyN30.4hBQaKSbQ0cHYa7QW_Dkd1ehr3vgFeygrsTvWIlbT8w";
+const SUPABASE_URL =
+  "https://zjebodmbvpjspuofdfbk.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhbGciOiJIUzI1NiIsInJlZiI6InpqaWJvZG1idnBqc3B1b2ZkZmJrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU1NDgyMjcsImV4cCI6MjExMTEyNDIyN30.4hBQaKSbQ0cHYa7QW_Dkd1ehr3vgFeygrsTvWIlbT8w";
 
 let db = null;
 let backendReady = false;
@@ -542,12 +804,18 @@ let actualPumpState = false;
 let deviceOnline = false;
 let latestReadingTime = null;
 let busy = false;
+let profileReady = false;
 
 /* =====================================
    2. HTML ELEMENTS
 ===================================== */
 
 const pumpToggle = document.getElementById("pumpToggle");
+const farmProfileForm =
+  document.getElementById("farmProfileForm");
+
+const saveProfileBtn =
+  document.getElementById("saveProfileBtn");
 
 function setText(id, value) {
   document.getElementById(id).textContent = value;
@@ -558,11 +826,14 @@ function setText(id, value) {
 ===================================== */
 
 function setDeviceStatus(online) {
+
   deviceOnline = online;
 
   const dot = document.getElementById("deviceDot");
 
-  dot.className = online ? "dot online" : "dot offline";
+  dot.className = online
+    ? "dot online"
+    : "dot offline";
 
   setText(
     "deviceStatus",
@@ -578,6 +849,7 @@ function setDeviceStatus(online) {
 }
 
 function checkDeviceStatus() {
+
   if (!latestReadingTime) {
     setDeviceStatus(false);
     return;
@@ -585,7 +857,6 @@ function checkDeviceStatus() {
 
   const age = Date.now() - latestReadingTime;
 
-  // ESP32 uploads every 10 seconds.
   setDeviceStatus(age < 30000);
 }
 
@@ -598,52 +869,72 @@ function updateDashboard(reading) {
   const soil = Number(reading.soil_pct);
   const water = Number(reading.water_pct);
 
-  if (reading.soil_pct !== null &&
-      Number.isFinite(soil)) {
+  if (
+    reading.soil_pct !== null &&
+    reading.soil_pct !== undefined &&
+    Number.isFinite(soil)
+  ) {
 
     const value = Math.max(0, Math.min(100, soil));
 
     setText("soilValue", value);
+
     document.getElementById("soilProgress").style.width =
       value + "%";
 
     setText(
       "soilDescription",
-      value < 30 ? "Low soil moisture" :
-      value < 70 ? "Moderate soil moisture" :
-      "High soil moisture"
+      value < 30
+        ? "Low soil moisture"
+        : value < 70
+        ? "Moderate soil moisture"
+        : "High soil moisture"
     );
   }
 
-  if (reading.water_pct !== null &&
-      Number.isFinite(water)) {
+  if (
+    reading.water_pct !== null &&
+    reading.water_pct !== undefined &&
+    Number.isFinite(water)
+  ) {
 
     const value = Math.max(0, Math.min(100, water));
 
     setText("waterValue", value);
+
     document.getElementById("waterProgress").style.width =
       value + "%";
 
     setText(
       "waterDescription",
-      value < 20 ? "Low tank water level" :
-      value < 70 ? "Moderate tank water level" :
-      "Sufficient tank water"
+      value < 20
+        ? "Low tank water level"
+        : value < 70
+        ? "Moderate tank water level"
+        : "Sufficient tank water"
     );
   }
 
   if (typeof reading.pump_on === "boolean") {
+
     actualPumpState = reading.pump_on;
+
     updatePumpDisplay();
   }
 
   if (reading.created_at) {
-    latestReadingTime = new Date(reading.created_at).getTime();
 
-    setText(
-      "lastUpdate",
-      new Date(latestReadingTime).toLocaleString()
-    );
+    const timestamp = new Date(reading.created_at).getTime();
+
+    if (Number.isFinite(timestamp)) {
+
+      latestReadingTime = timestamp;
+
+      setText(
+        "lastUpdate",
+        new Date(timestamp).toLocaleString()
+      );
+    }
   }
 
   checkDeviceStatus();
@@ -680,13 +971,18 @@ async function loadLatestReading() {
     .limit(1);
 
   if (error) {
+
     console.error("Readings:", error.message);
+
     return;
   }
 
   if (data && data.length > 0) {
+
     updateDashboard(data[0]);
+
   } else {
+
     setDeviceStatus(false);
   }
 }
@@ -704,21 +1000,27 @@ async function loadHistory() {
     .limit(15);
 
   if (error) {
+
     console.error("History:", error.message);
+
     return;
   }
 
   const body = document.getElementById("historyBody");
 
   if (!data || data.length === 0) {
+
     body.innerHTML =
       '<tr><td colspan="4" class="empty">No readings available.</td></tr>';
+
     return;
   }
 
   body.innerHTML = data.map(row => {
 
-    const time = new Date(row.created_at).toLocaleString();
+    const time = row.created_at
+      ? new Date(row.created_at).toLocaleString()
+      : "--";
 
     return `
       <tr>
@@ -729,6 +1031,7 @@ async function loadHistory() {
              row.pump_on === false ? "OFF" : "--"}</td>
       </tr>
     `;
+
   }).join("");
 }
 
@@ -745,13 +1048,24 @@ async function loadPumpCommand() {
     .maybeSingle();
 
   if (error) {
-    setText("pumpMessage", "Could not read pump command.");
+
+    setText(
+      "pumpMessage",
+      "Could not read pump command."
+    );
+
     console.error(error.message);
+
     return;
   }
 
   if (!data) {
-    setText("pumpMessage", "Pump control record is missing.");
+
+    setText(
+      "pumpMessage",
+      "Pump control record is missing."
+    );
+
     return;
   }
 
@@ -760,7 +1074,11 @@ async function loadPumpCommand() {
     data.manual_state === true;
 
   updatePumpButton();
-  setText("commandStatus", pumpCommand ? "ON requested" : "OFF requested");
+
+  setText(
+    "commandStatus",
+    pumpCommand ? "ON requested" : "OFF requested"
+  );
 }
 
 /* =====================================
@@ -773,60 +1091,78 @@ pumpToggle.addEventListener("click", async () => {
 
   const nextState = !pumpCommand;
 
-  // Prevent starting a new pump run if the tank is
-  // reporting a very low water level.
-  const water = Number(document.getElementById("waterValue").textContent);
+  const water = Number(
+    document.getElementById("waterValue").textContent
+  );
 
-  if (nextState && (!Number.isFinite(water) || water < 20)) {
+  if (
+    nextState &&
+    (!Number.isFinite(water) || water < 20)
+  ) {
+
     setText(
       "pumpMessage",
       "Pump start blocked: water level is low or unavailable."
     );
+
     return;
   }
 
   busy = true;
+
   pumpToggle.disabled = true;
+
   pumpToggle.textContent = "SENDING...";
-
-  setText("pumpMessage", "Sending command to ESP32...");
-
-  const { error } = await db
-    .from("pump_control")
-    .update({
-      mode: "manual",
-      manual_state: nextState,
-      updated_at: new Date().toISOString()
-    })
-    .eq("id", 1);
-
-  busy = false;
-
-  if (error) {
-    setText("pumpMessage", "Command failed: " + error.message);
-    updatePumpButton();
-    return;
-  }
-
-  pumpCommand = nextState;
-
-  setText(
-    "commandStatus",
-    nextState ? "ON requested" : "OFF requested"
-  );
 
   setText(
     "pumpMessage",
-    "Command saved. Waiting for ESP32 confirmation."
+    "Sending command to ESP32..."
   );
 
-  updatePumpButton();
+  try {
+
+    const { error } = await db
+      .from("pump_control")
+      .update({
+        mode: "manual",
+        manual_state: nextState,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", 1);
+
+    if (error) throw error;
+
+    pumpCommand = nextState;
+
+    setText(
+      "commandStatus",
+      nextState ? "ON requested" : "OFF requested"
+    );
+
+    setText(
+      "pumpMessage",
+      "Command saved. Waiting for ESP32 confirmation."
+    );
+
+  } catch (error) {
+
+    setText(
+      "pumpMessage",
+      "Command failed: " + error.message
+    );
+
+    console.error(error);
+
+  } finally {
+
+    busy = false;
+
+    updatePumpButton();
+  }
 });
 
 function updatePumpButton() {
 
-  // The button is enabled only if backend and device
-  // are connected and no request is in progress.
   pumpToggle.disabled =
     !backendReady || !deviceOnline || busy;
 
@@ -853,7 +1189,9 @@ function subscribeToReadings() {
         table: "readings"
       },
       async (payload) => {
+
         updateDashboard(payload.new);
+
         await loadHistory();
       }
     )
@@ -894,7 +1232,254 @@ function subscribeToPumpControl() {
 }
 
 /* =====================================
-   11. INITIALIZE SUPABASE
+   11. FARM PROFILE STATUS
+===================================== */
+
+function setProfileStatus(message, type = "") {
+
+  const status = document.getElementById("profileStatus");
+
+  status.textContent = message;
+
+  status.className = "profile-status";
+
+  if (type) {
+    status.classList.add(type);
+  }
+}
+
+/* =====================================
+   12. DISPLAY SAVED PROFILE
+===================================== */
+
+function displayProfileSummary(profile) {
+
+  const summary = document.getElementById("profileSummary");
+
+  const summaryText =
+    document.getElementById("profileSummaryText");
+
+  const details = [
+    `Crop: ${profile.crop_name}`,
+    `Growth stage: ${profile.growth_stage}`,
+    `Soil type: ${profile.soil_type}`,
+    `Location: ${profile.farm_location || "Not provided"}`,
+    `Farm size: ${
+      profile.farm_size !== null &&
+      profile.farm_size !== undefined
+        ? profile.farm_size + " " + profile.farm_size_unit
+        : "Not provided"
+    }`
+  ];
+
+  summaryText.textContent = details.join(" | ");
+
+  summary.style.display = "block";
+}
+
+/* =====================================
+   13. LOAD FARM PROFILE
+===================================== */
+
+async function loadFarmProfile() {
+
+  setProfileStatus("Loading farm profile...");
+
+  const { data, error } = await db
+    .from("farm_profile")
+    .select("*")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (error) {
+
+    setProfileStatus(
+      "Could not load farm profile: " + error.message,
+      "error"
+    );
+
+    console.error("Farm profile:", error);
+
+    return;
+  }
+
+  if (!data) {
+
+    setProfileStatus(
+      "No crop profile saved yet. Enter your farm information."
+    );
+
+    saveProfileBtn.textContent = "SAVE CROP PROFILE";
+
+    saveProfileBtn.disabled = false;
+
+    profileReady = true;
+
+    return;
+  }
+
+  document.getElementById("cropName").value =
+    data.crop_name || "";
+
+  document.getElementById("growthStage").value =
+    data.growth_stage || "";
+
+  document.getElementById("soilType").value =
+    data.soil_type || "";
+
+  document.getElementById("farmLocation").value =
+    data.farm_location || "";
+
+  document.getElementById("farmSize").value =
+    data.farm_size ?? "";
+
+  document.getElementById("farmSizeUnit").value =
+    data.farm_size_unit || "acres";
+
+  displayProfileSummary(data);
+
+  setProfileStatus(
+    "Farm profile loaded successfully.",
+    "success"
+  );
+
+  saveProfileBtn.textContent = "UPDATE CROP PROFILE";
+
+  saveProfileBtn.disabled = false;
+
+  profileReady = true;
+}
+
+/* =====================================
+   14. SAVE FARM PROFILE
+===================================== */
+
+farmProfileForm.addEventListener("submit", async (event) => {
+
+  event.preventDefault();
+
+  if (!backendReady || !profileReady) {
+
+    setProfileStatus(
+      "Please wait for the backend connection.",
+      "error"
+    );
+
+    return;
+  }
+
+  const cropName =
+    document.getElementById("cropName").value.trim();
+
+  const growthStage =
+    document.getElementById("growthStage").value;
+
+  const soilType =
+    document.getElementById("soilType").value;
+
+  const farmLocation =
+    document.getElementById("farmLocation").value.trim();
+
+  const farmSizeInput =
+    document.getElementById("farmSize").value;
+
+  const farmSizeUnit =
+    document.getElementById("farmSizeUnit").value;
+
+  if (!cropName || !growthStage || !soilType) {
+
+    setProfileStatus(
+      "Please complete all required fields.",
+      "error"
+    );
+
+    return;
+  }
+
+  let farmSize = null;
+
+  if (farmSizeInput !== "") {
+
+    farmSize = Number(farmSizeInput);
+
+    if (!Number.isFinite(farmSize) || farmSize < 0) {
+
+      setProfileStatus(
+        "Please enter a valid farm size.",
+        "error"
+      );
+
+      return;
+    }
+  }
+
+  const profile = {
+
+    id: 1,
+
+    crop_name: cropName,
+
+    growth_stage: growthStage,
+
+    soil_type: soilType,
+
+    farm_location: farmLocation || null,
+
+    farm_size: farmSize,
+
+    farm_size_unit: farmSizeUnit,
+
+    updated_at: new Date().toISOString()
+  };
+
+  saveProfileBtn.disabled = true;
+
+  saveProfileBtn.textContent = "SAVING...";
+
+  setProfileStatus(
+    "Saving your farm profile..."
+  );
+
+  try {
+
+    const { data, error } = await db
+      .from("farm_profile")
+      .upsert(profile, {
+        onConflict: "id"
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    displayProfileSummary(data);
+
+    setProfileStatus(
+      "Farm profile saved successfully!",
+      "success"
+    );
+
+    saveProfileBtn.textContent = "UPDATE CROP PROFILE";
+
+  } catch (error) {
+
+    console.error("Save profile:", error);
+
+    setProfileStatus(
+      "Could not save profile: " + error.message,
+      "error"
+    );
+
+    saveProfileBtn.textContent = "SAVE CROP PROFILE";
+
+  } finally {
+
+    saveProfileBtn.disabled = false;
+  }
+});
+
+/* =====================================
+   15. INITIALIZE SUPABASE
 ===================================== */
 
 async function initialize() {
@@ -906,15 +1491,41 @@ async function initialize() {
     !SUPABASE_ANON_KEY.includes("YOUR_SUPABASE");
 
   if (!validConfig) {
+
     setText("backendStatus", "Not configured");
-    setText("pumpMessage", "Add your Supabase project URL and key.");
+
+    setText(
+      "pumpMessage",
+      "Add your Supabase project URL and key."
+    );
+
     setDeviceStatus(false);
+
+    setProfileStatus(
+      "Supabase configuration is missing.",
+      "error"
+    );
+
     return;
   }
 
   if (!window.supabase) {
-    setText("backendStatus", "Supabase library unavailable");
-    setText("pumpMessage", "Check your internet connection and reload.");
+
+    setText(
+      "backendStatus",
+      "Supabase library unavailable"
+    );
+
+    setText(
+      "pumpMessage",
+      "Check your internet connection and reload."
+    );
+
+    setProfileStatus(
+      "Supabase library unavailable.",
+      "error"
+    );
+
     return;
   }
 
@@ -937,10 +1548,15 @@ async function initialize() {
     setText("backendStatus", "Connected");
 
     await loadLatestReading();
+
     await loadHistory();
+
     await loadPumpCommand();
 
+    await loadFarmProfile();
+
     subscribeToReadings();
+
     subscribeToPumpControl();
 
     setInterval(checkDeviceStatus, 5000);
@@ -950,9 +1566,15 @@ async function initialize() {
     backendReady = false;
 
     setText("backendStatus", "Connection failed");
+
     setText("pumpMessage", error.message);
 
     setDeviceStatus(false);
+
+    setProfileStatus(
+      "Backend connection failed: " + error.message,
+      "error"
+    );
 
     console.error("Supabase connection:", error);
   }
