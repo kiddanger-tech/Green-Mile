@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#123d2a">
+<meta name="description" content="GREEN MILE smart irrigation and AI crop intelligence dashboard">
 <title>GREEN MILE | Smart Irrigation</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -21,6 +22,7 @@
   --muted: #718078;
   --border: #e4ebe5;
   --red: #d94b4b;
+  --orange: #d68b19;
 }
 
 * {
@@ -36,12 +38,14 @@ body {
   min-height: 100vh;
 }
 
-button, input, select {
+button {
   font: inherit;
+  cursor: pointer;
 }
 
-button {
-  cursor: pointer;
+button:disabled {
+  opacity: .5;
+  cursor: not-allowed;
 }
 
 header {
@@ -252,8 +256,7 @@ main {
   background: #26372d;
 }
 
-.toggle:disabled,
-.save-btn:disabled {
+.toggle:disabled {
   opacity: .45;
   cursor: not-allowed;
 }
@@ -330,104 +333,354 @@ th {
   color: var(--muted);
 }
 
-/* FARM PROFILE */
+/* ==========================================
+   AI CROP INTELLIGENCE
+========================================== */
 
-.profile-intro {
+.ai-section {
+  margin-top: 25px;
+  padding: 25px;
+  background: #ffffff;
+  border: 1px solid #dcebe0;
+  border-radius: 18px;
+  box-shadow: 0 5px 20px rgba(20, 50, 30, .045);
+}
+
+.ai-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.ai-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  margin-bottom: 9px;
+}
+
+.ai-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 9px rgba(34,197,94,.5);
+}
+
+.ai-header h2 {
+  font-size: 25px;
+  margin-bottom: 7px;
+}
+
+.ai-header p {
   color: var(--muted);
   font-size: 13px;
-  line-height: 1.7;
-  margin-bottom: 22px;
+  line-height: 1.6;
 }
 
-.profile-grid {
+.ai-icon {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  place-items: center;
+  min-width: 55px;
+  height: 55px;
+  border-radius: 15px;
+  background: #e7f5ec;
+  color: var(--green);
+  font-size: 30px;
 }
 
-.form-group {
+.ai-status-bar {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f1f8f3;
+  margin-bottom: 17px;
+  font-size: 12px;
 }
 
-.form-group.full {
-  grid-column: 1 / -1;
+.ai-status-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
 }
 
-.form-group label {
-  font-size: 13px;
-  font-weight: 700;
+.ai-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
 }
 
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 13px 14px;
+.ai-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.ai-mini-card {
+  padding: 15px;
   border: 1px solid var(--border);
-  border-radius: 9px;
-  outline: none;
-  background: #fff;
-  color: var(--text);
+  border-radius: 11px;
+  background: #fbfdfb;
+  min-width: 0;
 }
 
-.form-group input:focus,
-.form-group select:focus {
-  border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(23,107,67,.08);
-}
-
-.form-help {
+.ai-mini-label {
+  display: block;
+  margin-bottom: 9px;
   color: var(--muted);
   font-size: 11px;
 }
 
-.profile-actions {
+.ai-mini-card strong {
+  display: block;
+  overflow-wrap: anywhere;
+  font-size: 16px;
+}
+
+.ai-warning {
   display: flex;
+  gap: 12px;
+  padding: 15px;
+  margin-top: 16px;
+  border: 1px solid #f2d49a;
+  border-radius: 11px;
+  background: #fff9eb;
+  color: #a86b08;
+}
+
+.ai-warning[hidden],
+.ai-loading[hidden],
+.ai-error[hidden],
+.ai-results[hidden] {
+  display: none !important;
+}
+
+.ai-warning p {
+  margin-top: 5px;
+  color: #745d37;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.ai-profile {
+  margin-top: 16px;
+  padding: 15px;
+  border-radius: 11px;
+  background: #f7faf7;
+}
+
+.ai-profile h3 {
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.ai-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.ai-profile-item span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-bottom: 5px;
+}
+
+.ai-profile-item strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.ai-action-area {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 15px;
-  flex-wrap: wrap;
-  margin-top: 22px;
+  gap: 18px;
+  margin-top: 20px;
+  padding: 17px;
+  border-radius: 12px;
+  background: #f7faf7;
 }
 
-.save-btn {
-  border: none;
-  background: var(--green);
-  color: white;
-  padding: 14px 24px;
-  border-radius: 9px;
-  font-weight: 700;
+.ai-action-area strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
 }
 
-.save-btn:hover {
-  background: #105735;
-}
-
-.profile-status {
+.ai-action-area p {
   color: var(--muted);
   font-size: 12px;
   line-height: 1.5;
 }
 
-.profile-status.success {
+.ai-generate-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  padding: 13px 19px;
+  border: none;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #176b43, #27a45e);
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  transition: transform .2s, opacity .2s;
+}
+
+.ai-generate-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.ai-generate-button:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+
+.ai-loading,
+.ai-error {
+  margin-top: 17px;
+  padding: 22px;
+  text-align: center;
+  border-radius: 12px;
+}
+
+.ai-loading {
+  background: #f0f7fc;
+  color: #245a7b;
+}
+
+.ai-spinner {
+  width: 35px;
+  height: 35px;
+  margin: 0 auto 13px;
+  border: 3px solid #c9e3f3;
+  border-top-color: #2589c7;
+  border-radius: 50%;
+  animation: aiSpin .75s linear infinite;
+}
+
+@keyframes aiSpin {
+  to { transform: rotate(360deg); }
+}
+
+.ai-loading p,
+.ai-error p {
+  margin-top: 7px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.ai-error {
+  background: #fff2f2;
+  border: 1px solid #f1cccc;
+  color: #b83232;
+}
+
+.ai-results {
+  margin-top: 19px;
+  padding: 20px;
+  border: 1px solid #dcebe0;
+  border-radius: 13px;
+  background: #fbfdfb;
+}
+
+.ai-results-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 17px;
+}
+
+.ai-result-label {
   color: var(--green);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
 }
 
-.profile-status.error {
-  color: var(--red);
+.ai-results-heading h3 {
+  margin-top: 6px;
+  font-size: 19px;
 }
 
-.profile-summary {
-  display: none;
-  margin-top: 22px;
-  padding: 16px;
-  border-radius: 10px;
-  background: var(--light-green);
-  line-height: 1.7;
+.ai-success-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e7f5ec;
+  color: var(--green);
+  font-weight: 900;
 }
 
-.profile-summary strong {
-  color: var(--dark);
+.ai-analysis-content {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #26372d;
+  overflow-wrap: anywhere;
+}
+
+.ai-analysis-content h4 {
+  color: var(--green);
+  font-size: 15px;
+  margin: 20px 0 8px;
+}
+
+.ai-analysis-content p {
+  margin: 6px 0;
+}
+
+.ai-analysis-content ul {
+  margin: 7px 0 12px 20px;
+}
+
+.ai-analysis-content li {
+  margin-bottom: 6px;
+}
+
+.ai-analysis-content strong {
+  color: #173d29;
+}
+
+.ai-report-footer {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 15px;
+  margin-top: 18px;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.ai-bottom-note {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.ai-refresh-note {
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 11px;
 }
 
 footer {
@@ -435,6 +688,25 @@ footer {
   padding: 30px 15px;
   font-size: 12px;
   color: var(--muted);
+}
+
+@media(max-width: 760px) {
+  .ai-overview-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ai-profile-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ai-action-area {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ai-generate-button {
+    width: 100%;
+  }
 }
 
 @media(max-width: 650px) {
@@ -454,22 +726,35 @@ footer {
     font-size: 35px;
   }
 
-  .system-info,
-  .profile-grid {
+  .system-info {
     grid-template-columns: 1fr;
   }
+}
 
-  .form-group.full {
-    grid-column: auto;
+@media(max-width: 420px) {
+  .ai-section {
+    padding: 16px;
   }
 
-  .profile-actions {
-    align-items: stretch;
+  .ai-mini-card {
+    padding: 12px;
+  }
+
+  .ai-mini-card strong {
+    font-size: 14px;
+  }
+
+  .ai-profile-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ai-status-bar {
+    align-items: flex-start;
     flex-direction: column;
   }
 
-  .save-btn {
-    width: 100%;
+  .ai-header h2 {
+    font-size: 21px;
   }
 }
 </style>
@@ -585,7 +870,7 @@ footer {
 
   </div>
 
-  <!-- DEVICE INFORMATION -->
+  <!-- SYSTEM INFORMATION -->
   <div class="card section">
     <h3>System Information</h3>
 
@@ -612,148 +897,193 @@ footer {
     </div>
   </div>
 
-  <!-- FARMER CROP PROFILE -->
-  <div class="card section">
+  <!-- =====================================
+       AI CROP INTELLIGENCE
+  ====================================== -->
 
-    <h3>🌾 Farm Crop Profile</h3>
+  <section class="ai-section" id="aiIntelligence">
 
-    <p class="profile-intro">
-      Provide information about the crop you are cultivating.
-      This information will help GREEN MILE generate more relevant
-      crop monitoring insights and irrigation recommendations.
-    </p>
-
-    <form id="farmProfileForm">
-
-      <div class="profile-grid">
-
-        <div class="form-group">
-          <label for="cropName">Crop Name *</label>
-
-          <input
-            type="text"
-            id="cropName"
-            list="cropSuggestions"
-            placeholder="e.g. Maize, Tomato, Pepper"
-            maxlength="100"
-            required
-          >
-
-          <datalist id="cropSuggestions">
-            <option value="Maize">
-            <option value="Tomato">
-            <option value="Cassava">
-            <option value="Pepper">
-            <option value="Rice">
-            <option value="Onion">
-            <option value="Okra">
-            <option value="Cabbage">
-            <option value="Cucumber">
-            <option value="Plantain">
-            <option value="Yam">
-            <option value="Groundnut">
-          </datalist>
+    <div class="ai-header">
+      <div>
+        <div class="ai-eyebrow">
+          <span class="ai-pulse"></span>
+          INTELLIGENT FARMING SYSTEM
         </div>
 
-        <div class="form-group">
-          <label for="growthStage">Growth Stage *</label>
+        <h2>AI Crop Intelligence</h2>
 
-          <select id="growthStage" required>
-            <option value="">Select growth stage</option>
-            <option value="Land preparation">Land preparation</option>
-            <option value="Planting">Planting</option>
-            <option value="Germination">Germination</option>
-            <option value="Seedling">Seedling</option>
-            <option value="Vegetative growth">Vegetative growth</option>
-            <option value="Flowering">Flowering</option>
-            <option value="Fruiting">Fruiting</option>
-            <option value="Maturity">Maturity</option>
-            <option value="Harvesting">Harvesting</option>
-          </select>
+        <p>
+          Understand your farm conditions and receive
+          intelligent crop and irrigation recommendations.
+        </p>
+      </div>
+
+      <div class="ai-icon">✦</div>
+    </div>
+
+    <div class="ai-status-bar">
+      <div class="ai-status-left">
+        <span class="ai-status-dot" id="aiStatusDot"></span>
+        <span id="aiConnectionStatus">AI system ready</span>
+      </div>
+
+      <span id="aiModelStatus">Gemini AI</span>
+    </div>
+
+    <!-- SENSOR OVERVIEW -->
+    <div class="ai-overview-grid">
+
+      <div class="ai-mini-card">
+        <span class="ai-mini-label">Crop</span>
+        <strong id="aiCropName">Loading...</strong>
+      </div>
+
+      <div class="ai-mini-card">
+        <span class="ai-mini-label">Growth Stage</span>
+        <strong id="aiGrowthStage">--</strong>
+      </div>
+
+      <div class="ai-mini-card">
+        <span class="ai-mini-label">Soil Moisture</span>
+        <strong id="aiSoilMoisture">--</strong>
+      </div>
+
+      <div class="ai-mini-card">
+        <span class="ai-mini-label">Water Tank</span>
+        <strong id="aiWaterLevel">--</strong>
+      </div>
+
+    </div>
+
+    <!-- SENSOR HEALTH WARNING -->
+    <div class="ai-warning" id="aiSensorWarning" hidden>
+      <span>⚠</span>
+
+      <div>
+        <strong>Soil sensor health warning</strong>
+        <p id="aiSensorWarningText"></p>
+      </div>
+    </div>
+
+    <!-- FARM PROFILE -->
+    <div class="ai-profile">
+
+      <h3>Registered Farm Profile</h3>
+
+      <div class="ai-profile-grid">
+
+        <div class="ai-profile-item">
+          <span>Crop</span>
+          <strong id="aiProfileCrop">--</strong>
         </div>
 
-        <div class="form-group">
-          <label for="soilType">Soil Type *</label>
-
-          <select id="soilType" required>
-            <option value="">Select soil type</option>
-            <option value="Sandy soil">Sandy soil</option>
-            <option value="Clay soil">Clay soil</option>
-            <option value="Loamy soil">Loamy soil</option>
-            <option value="Silt soil">Silt soil</option>
-            <option value="Sandy loam">Sandy loam</option>
-            <option value="Clay loam">Clay loam</option>
-            <option value="Other">Other / Unknown</option>
-          </select>
+        <div class="ai-profile-item">
+          <span>Soil type</span>
+          <strong id="aiProfileSoil">--</strong>
         </div>
 
-        <div class="form-group">
-          <label for="farmLocation">Farm Location</label>
-
-          <input
-            type="text"
-            id="farmLocation"
-            placeholder="e.g. Kumasi, Ashanti Region"
-            maxlength="150"
-          >
+        <div class="ai-profile-item">
+          <span>Growth stage</span>
+          <strong id="aiProfileStage">--</strong>
         </div>
 
-        <div class="form-group">
-          <label for="farmSize">Farm Size</label>
-
-          <input
-            type="number"
-            id="farmSize"
-            min="0"
-            step="0.01"
-            placeholder="e.g. 2.5"
-          >
+        <div class="ai-profile-item">
+          <span>Location</span>
+          <strong id="aiProfileLocation">--</strong>
         </div>
 
-        <div class="form-group">
-          <label for="farmSizeUnit">Farm Size Unit</label>
+        <div class="ai-profile-item">
+          <span>Farm size</span>
+          <strong id="aiProfileSize">--</strong>
+        </div>
 
-          <select id="farmSizeUnit">
-            <option value="acres">Acres</option>
-            <option value="hectares">Hectares</option>
-            <option value="square meters">Square meters</option>
-          </select>
+        <div class="ai-profile-item">
+          <span>Latest readings analyzed</span>
+          <strong id="aiReadingsCount">--</strong>
         </div>
 
       </div>
+    </div>
 
-      <div class="profile-actions">
+    <!-- AI ACTION -->
+    <div class="ai-action-area">
 
-        <button
-          type="submit"
-          class="save-btn"
-          id="saveProfileBtn"
-          disabled
-        >
-          SAVE CROP PROFILE
-        </button>
-
-        <div class="profile-status" id="profileStatus">
-          Connecting to farm profile...
-        </div>
-
+      <div>
+        <strong>AI Farm Analysis</strong>
+        <p>
+          Ask Gemini to assess your saved farm profile
+          and latest sensor readings.
+        </p>
       </div>
 
-    </form>
+      <button
+        type="button"
+        id="generateAIButton"
+        class="ai-generate-button"
+      >
+        <span id="aiButtonIcon">✦</span>
+        <span id="aiButtonText">Generate AI Analysis</span>
+      </button>
 
-    <div class="profile-summary" id="profileSummary">
-      <strong>Saved Farm Profile</strong>
-      <div id="profileSummaryText"></div>
     </div>
 
-    <div class="notice">
-      This is currently a shared farm profile. Individual farmer
-      profiles will be introduced when the login system is added.
+    <div class="ai-refresh-note" id="aiRefreshNote">
+      Analysis runs only when requested.
     </div>
 
-  </div>
+    <!-- LOADING -->
+    <div class="ai-loading" id="aiLoading" hidden>
+      <div class="ai-spinner"></div>
 
-  <!-- HISTORY -->
+      <strong>Analyzing your farm...</strong>
+
+      <p>
+        Gemini is examining your crop profile and
+        recent sensor readings.
+      </p>
+    </div>
+
+    <!-- ERROR -->
+    <div class="ai-error" id="aiError" hidden>
+      <strong>Analysis unavailable</strong>
+      <p id="aiErrorText"></p>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="ai-results" id="aiResults" hidden>
+
+      <div class="ai-results-heading">
+        <div>
+          <span class="ai-result-label">
+            ANALYSIS COMPLETE
+          </span>
+
+          <h3>Farm Intelligence Report</h3>
+        </div>
+
+        <span class="ai-success-icon">✓</span>
+      </div>
+
+      <div
+        id="aiAnalysisContent"
+        class="ai-analysis-content"
+      ></div>
+
+      <div class="ai-report-footer">
+        <span id="aiGeneratedAt">--</span>
+        <span id="aiModelUsed">Gemini AI</span>
+      </div>
+
+    </div>
+
+    <div class="ai-bottom-note">
+      AI recommendations are decision-support guidance.
+      Verify field conditions and sensor accuracy before irrigation.
+    </div>
+
+  </section>
+
+  <!-- SENSOR HISTORY -->
   <div class="card section">
     <h3>Recent Sensor Readings</h3>
 
@@ -786,7 +1116,6 @@ footer {
 </footer>
 
 <script>
-
 /* =====================================
    1. SUPABASE CONFIGURATION
 ===================================== */
@@ -799,31 +1128,53 @@ const SUPABASE_ANON_KEY =
 
 let db = null;
 let backendReady = false;
+
 let pumpCommand = false;
 let actualPumpState = false;
 let deviceOnline = false;
 let latestReadingTime = null;
+let latestReading = null;
+
 let busy = false;
-let profileReady = false;
+let aiRequestInProgress = false;
+
+let lastAIAnalysis = null;
+let lastAIAnalysisTime = 0;
+
+const AI_CACHE_DURATION = 60000;
+const AI_MIN_REQUEST_INTERVAL = 15000;
+
+let lastAIRequestTime = 0;
 
 /* =====================================
-   2. HTML ELEMENTS
+   2. GENERAL HELPERS
 ===================================== */
 
-const pumpToggle = document.getElementById("pumpToggle");
-const farmProfileForm =
-  document.getElementById("farmProfileForm");
-
-const saveProfileBtn =
-  document.getElementById("saveProfileBtn");
-
 function setText(id, value) {
-  document.getElementById(id).textContent = value;
+  const element = document.getElementById(id);
+
+  if (element) {
+    element.textContent =
+      value === null || value === undefined
+        ? "--"
+        : String(value);
+  }
+}
+
+function showElement(id, visible) {
+  const element = document.getElementById(id);
+
+  if (element) {
+    element.hidden = !visible;
+  }
 }
 
 /* =====================================
-   3. CONNECTION STATUS
+   3. DEVICE CONNECTION STATUS
 ===================================== */
+
+const pumpToggle =
+  document.getElementById("pumpToggle");
 
 function setDeviceStatus(online) {
 
@@ -857,7 +1208,9 @@ function checkDeviceStatus() {
 
   const age = Date.now() - latestReadingTime;
 
-  setDeviceStatus(age < 30000);
+  setDeviceStatus(
+    age >= 0 && age < 30000
+  );
 }
 
 /* =====================================
@@ -866,12 +1219,15 @@ function checkDeviceStatus() {
 
 function updateDashboard(reading) {
 
+  if (!reading) return;
+
+  latestReading = reading;
+
   const soil = Number(reading.soil_pct);
   const water = Number(reading.water_pct);
 
   if (
     reading.soil_pct !== null &&
-    reading.soil_pct !== undefined &&
     Number.isFinite(soil)
   ) {
 
@@ -879,22 +1235,22 @@ function updateDashboard(reading) {
 
     setText("soilValue", value);
 
-    document.getElementById("soilProgress").style.width =
-      value + "%";
+    document.getElementById(
+      "soilProgress"
+    ).style.width = value + "%";
 
     setText(
       "soilDescription",
       value < 30
         ? "Low soil moisture"
         : value < 70
-        ? "Moderate soil moisture"
-        : "High soil moisture"
+          ? "Moderate soil moisture"
+          : "High soil moisture"
     );
   }
 
   if (
     reading.water_pct !== null &&
-    reading.water_pct !== undefined &&
     Number.isFinite(water)
   ) {
 
@@ -902,16 +1258,17 @@ function updateDashboard(reading) {
 
     setText("waterValue", value);
 
-    document.getElementById("waterProgress").style.width =
-      value + "%";
+    document.getElementById(
+      "waterProgress"
+    ).style.width = value + "%";
 
     setText(
       "waterDescription",
       value < 20
         ? "Low tank water level"
         : value < 70
-        ? "Moderate tank water level"
-        : "Sufficient tank water"
+          ? "Moderate tank water level"
+          : "Sufficient tank water"
     );
   }
 
@@ -924,7 +1281,8 @@ function updateDashboard(reading) {
 
   if (reading.created_at) {
 
-    const timestamp = new Date(reading.created_at).getTime();
+    const timestamp =
+      new Date(reading.created_at).getTime();
 
     if (Number.isFinite(timestamp)) {
 
@@ -937,18 +1295,23 @@ function updateDashboard(reading) {
     }
   }
 
+  updateAIOverview(reading);
+
   checkDeviceStatus();
 }
 
 function updatePumpDisplay() {
 
-  const state = document.getElementById("pumpState");
+  const state =
+    document.getElementById("pumpState");
 
-  state.textContent = actualPumpState ? "ON" : "OFF";
+  state.textContent =
+    actualPumpState ? "ON" : "OFF";
 
-  state.className = actualPumpState
-    ? "pump-state on"
-    : "pump-state off";
+  state.className =
+    actualPumpState
+      ? "pump-state on"
+      : "pump-state off";
 
   setText(
     "pumpDescription",
@@ -959,7 +1322,7 @@ function updatePumpDisplay() {
 }
 
 /* =====================================
-   5. LOAD LATEST READING
+   5. LOAD LATEST SENSOR READING
 ===================================== */
 
 async function loadLatestReading() {
@@ -967,12 +1330,16 @@ async function loadLatestReading() {
   const { data, error } = await db
     .from("readings")
     .select("*")
-    .order("created_at", { ascending: false })
+    .order("created_at", {
+      ascending: false
+    })
     .limit(1);
 
   if (error) {
-
-    console.error("Readings:", error.message);
+    console.error(
+      "Latest reading:",
+      error.message
+    );
 
     return;
   }
@@ -988,7 +1355,7 @@ async function loadLatestReading() {
 }
 
 /* =====================================
-   6. LOAD HISTORY
+   6. LOAD SENSOR HISTORY
 ===================================== */
 
 async function loadHistory() {
@@ -996,47 +1363,202 @@ async function loadHistory() {
   const { data, error } = await db
     .from("readings")
     .select("created_at,soil_pct,water_pct,pump_on")
-    .order("created_at", { ascending: false })
+    .order("created_at", {
+      ascending: false
+    })
     .limit(15);
 
   if (error) {
 
-    console.error("History:", error.message);
+    console.error(
+      "History:",
+      error.message
+    );
 
     return;
   }
 
-  const body = document.getElementById("historyBody");
+  const body =
+    document.getElementById("historyBody");
+
+  body.replaceChildren();
 
   if (!data || data.length === 0) {
 
-    body.innerHTML =
-      '<tr><td colspan="4" class="empty">No readings available.</td></tr>';
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+
+    cell.colSpan = 4;
+    cell.className = "empty";
+    cell.textContent = "No readings available.";
+
+    row.appendChild(cell);
+    body.appendChild(row);
 
     return;
   }
 
-  body.innerHTML = data.map(row => {
+  data.forEach((item) => {
 
-    const time = row.created_at
-      ? new Date(row.created_at).toLocaleString()
+    const row = document.createElement("tr");
+
+    const time = document.createElement("td");
+    const soil = document.createElement("td");
+    const water = document.createElement("td");
+    const pump = document.createElement("td");
+
+    time.textContent = item.created_at
+      ? new Date(item.created_at).toLocaleString()
       : "--";
 
-    return `
-      <tr>
-        <td>${time}</td>
-        <td>${row.soil_pct ?? "--"}%</td>
-        <td>${row.water_pct ?? "--"}%</td>
-        <td>${row.pump_on === true ? "ON" :
-             row.pump_on === false ? "OFF" : "--"}</td>
-      </tr>
-    `;
+    soil.textContent =
+      item.soil_pct == null
+        ? "--"
+        : `${item.soil_pct}%`;
 
-  }).join("");
+    water.textContent =
+      item.water_pct == null
+        ? "--"
+        : `${item.water_pct}%`;
+
+    pump.textContent =
+      item.pump_on === true
+        ? "ON"
+        : item.pump_on === false
+          ? "OFF"
+          : "--";
+
+    row.append(time, soil, water, pump);
+
+    body.appendChild(row);
+  });
 }
 
 /* =====================================
-   7. LOAD PUMP COMMAND
+   7. LOAD FARM PROFILE
+===================================== */
+
+async function loadFarmProfile() {
+
+  const { data, error } = await db
+    .from("farm_profile")
+    .select("*")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (error) {
+
+    console.error(
+      "Farm profile:",
+      error.message
+    );
+
+    setText(
+      "aiCropName",
+      "Profile unavailable"
+    );
+
+    return;
+  }
+
+  if (!data) {
+
+    setText(
+      "aiCropName",
+      "No profile saved"
+    );
+
+    return;
+  }
+
+  updateFarmProfileDisplay(data);
+}
+
+function updateFarmProfileDisplay(profile) {
+
+  setText(
+    "aiCropName",
+    profile.crop_name || "Not set"
+  );
+
+  setText(
+    "aiGrowthStage",
+    profile.growth_stage || "--"
+  );
+
+  setText(
+    "aiProfileCrop",
+    profile.crop_name || "--"
+  );
+
+  setText(
+    "aiProfileSoil",
+    profile.soil_type || "--"
+  );
+
+  setText(
+    "aiProfileStage",
+    profile.growth_stage || "--"
+  );
+
+  setText(
+    "aiProfileLocation",
+    profile.farm_location || "--"
+  );
+
+  const size =
+    profile.farm_size == null
+      ? "--"
+      : `${profile.farm_size} ${profile.farm_size_unit || "acres"}`;
+
+  setText("aiProfileSize", size);
+}
+
+/* =====================================
+   8. AI SENSOR OVERVIEW AND WARNINGS
+===================================== */
+
+function updateAIOverview(reading) {
+
+  if (!reading) return;
+
+  setText(
+    "aiSoilMoisture",
+    reading.soil_pct == null
+      ? "--"
+      : `${reading.soil_pct}%`
+  );
+
+  setText(
+    "aiWaterLevel",
+    reading.water_pct == null
+      ? "--"
+      : `${reading.water_pct}%`
+  );
+
+  const raw = Number(reading.soil_raw);
+
+  const suspicious =
+    reading.soil_raw != null &&
+    Number.isFinite(raw) &&
+    (raw >= 4090 || raw <= 5);
+
+  showElement(
+    "aiSensorWarning",
+    suspicious
+  );
+
+  if (suspicious) {
+
+    setText(
+      "aiSensorWarningText",
+      `The latest raw soil sensor reading is ${raw}. This is close to an ADC limit and may indicate a sensor, wiring, placement, or calibration issue. Check the sensor physically before relying on its moisture percentage.`
+    );
+  }
+}
+
+/* =====================================
+   9. LOAD PUMP COMMAND
 ===================================== */
 
 async function loadPumpCommand() {
@@ -1077,104 +1599,125 @@ async function loadPumpCommand() {
 
   setText(
     "commandStatus",
-    pumpCommand ? "ON requested" : "OFF requested"
+    pumpCommand
+      ? "ON requested"
+      : "OFF requested"
   );
 }
 
 /* =====================================
-   8. PUMP TOGGLE
+   10. PUMP CONTROL
 ===================================== */
 
-pumpToggle.addEventListener("click", async () => {
+pumpToggle.addEventListener(
+  "click",
+  async () => {
 
-  if (!backendReady || !deviceOnline || busy) return;
+    if (
+      !backendReady ||
+      !deviceOnline ||
+      busy
+    ) {
+      return;
+    }
 
-  const nextState = !pumpCommand;
+    const nextState = !pumpCommand;
 
-  const water = Number(
-    document.getElementById("waterValue").textContent
-  );
-
-  if (
-    nextState &&
-    (!Number.isFinite(water) || water < 20)
-  ) {
-
-    setText(
-      "pumpMessage",
-      "Pump start blocked: water level is low or unavailable."
+    const water = Number(
+      document.getElementById(
+        "waterValue"
+      ).textContent
     );
 
-    return;
-  }
+    if (
+      nextState &&
+      (!Number.isFinite(water) || water < 20)
+    ) {
 
-  busy = true;
+      setText(
+        "pumpMessage",
+        "Pump start blocked: water level is low or unavailable."
+      );
 
-  pumpToggle.disabled = true;
+      return;
+    }
 
-  pumpToggle.textContent = "SENDING...";
-
-  setText(
-    "pumpMessage",
-    "Sending command to ESP32..."
-  );
-
-  try {
-
-    const { error } = await db
-      .from("pump_control")
-      .update({
-        mode: "manual",
-        manual_state: nextState,
-        updated_at: new Date().toISOString()
-      })
-      .eq("id", 1);
-
-    if (error) throw error;
-
-    pumpCommand = nextState;
-
-    setText(
-      "commandStatus",
-      nextState ? "ON requested" : "OFF requested"
-    );
-
-    setText(
-      "pumpMessage",
-      "Command saved. Waiting for ESP32 confirmation."
-    );
-
-  } catch (error) {
-
-    setText(
-      "pumpMessage",
-      "Command failed: " + error.message
-    );
-
-    console.error(error);
-
-  } finally {
-
-    busy = false;
+    busy = true;
 
     updatePumpButton();
+
+    pumpToggle.textContent = "SENDING...";
+
+    setText(
+      "pumpMessage",
+      "Sending command to ESP32..."
+    );
+
+    try {
+
+      const { error } = await db
+        .from("pump_control")
+        .update({
+          mode: "manual",
+          manual_state: nextState,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", 1);
+
+      if (error) {
+        throw error;
+      }
+
+      pumpCommand = nextState;
+
+      setText(
+        "commandStatus",
+        nextState
+          ? "ON requested"
+          : "OFF requested"
+      );
+
+      setText(
+        "pumpMessage",
+        "Command saved. Waiting for ESP32 confirmation."
+      );
+
+    } catch (error) {
+
+      setText(
+        "pumpMessage",
+        "Command failed: " + error.message
+      );
+
+    } finally {
+
+      busy = false;
+
+      updatePumpButton();
+    }
   }
-});
+);
 
 function updatePumpButton() {
 
   pumpToggle.disabled =
-    !backendReady || !deviceOnline || busy;
+    !backendReady ||
+    !deviceOnline ||
+    busy;
 
   pumpToggle.textContent =
-    pumpCommand ? "TURN PUMP OFF" : "TURN PUMP ON";
+    pumpCommand
+      ? "TURN PUMP OFF"
+      : "TURN PUMP ON";
 
   pumpToggle.className =
-    pumpCommand ? "toggle" : "toggle off";
+    pumpCommand
+      ? "toggle"
+      : "toggle off";
 }
 
 /* =====================================
-   9. REALTIME SENSOR UPDATES
+   11. REALTIME SENSOR UPDATES
 ===================================== */
 
 function subscribeToReadings() {
@@ -1199,7 +1742,7 @@ function subscribeToReadings() {
 }
 
 /* =====================================
-   10. REALTIME PUMP COMMAND UPDATES
+   12. REALTIME PUMP UPDATES
 ===================================== */
 
 function subscribeToPumpControl() {
@@ -1224,7 +1767,9 @@ function subscribeToPumpControl() {
 
         setText(
           "commandStatus",
-          pumpCommand ? "ON requested" : "OFF requested"
+          pumpCommand
+            ? "ON requested"
+            : "OFF requested"
         );
       }
     )
@@ -1232,279 +1777,450 @@ function subscribeToPumpControl() {
 }
 
 /* =====================================
-   11. FARM PROFILE STATUS
+   13. SAFE AI REPORT FORMATTER
 ===================================== */
 
-function setProfileStatus(message, type = "") {
+function formatAIAnalysis(markdown) {
 
-  const status = document.getElementById("profileStatus");
-
-  status.textContent = message;
-
-  status.className = "profile-status";
-
-  if (type) {
-    status.classList.add(type);
-  }
-}
-
-/* =====================================
-   12. DISPLAY SAVED PROFILE
-===================================== */
-
-function displayProfileSummary(profile) {
-
-  const summary = document.getElementById("profileSummary");
-
-  const summaryText =
-    document.getElementById("profileSummaryText");
-
-  const details = [
-    `Crop: ${profile.crop_name}`,
-    `Growth stage: ${profile.growth_stage}`,
-    `Soil type: ${profile.soil_type}`,
-    `Location: ${profile.farm_location || "Not provided"}`,
-    `Farm size: ${
-      profile.farm_size !== null &&
-      profile.farm_size !== undefined
-        ? profile.farm_size + " " + profile.farm_size_unit
-        : "Not provided"
-    }`
-  ];
-
-  summaryText.textContent = details.join(" | ");
-
-  summary.style.display = "block";
-}
-
-/* =====================================
-   13. LOAD FARM PROFILE
-===================================== */
-
-async function loadFarmProfile() {
-
-  setProfileStatus("Loading farm profile...");
-
-  const { data, error } = await db
-    .from("farm_profile")
-    .select("*")
-    .eq("id", 1)
-    .maybeSingle();
-
-  if (error) {
-
-    setProfileStatus(
-      "Could not load farm profile: " + error.message,
-      "error"
+  const container =
+    document.getElementById(
+      "aiAnalysisContent"
     );
 
-    console.error("Farm profile:", error);
+  container.replaceChildren();
 
-    return;
+  const lines = String(markdown || "")
+    .split(/\r?\n/);
+
+  let currentList = null;
+
+  function closeList() {
+    currentList = null;
   }
 
-  if (!data) {
+  function appendFormattedText(parent, value) {
 
-    setProfileStatus(
-      "No crop profile saved yet. Enter your farm information."
-    );
+    // Support simple bold Markdown without inserting
+    // untrusted HTML into the page.
+    const pieces = value.split(/(\*\*.*?\*\*)/g);
 
-    saveProfileBtn.textContent = "SAVE CROP PROFILE";
+    pieces.forEach((piece) => {
 
-    saveProfileBtn.disabled = false;
+      if (
+        piece.startsWith("**") &&
+        piece.endsWith("**")
+      ) {
 
-    profileReady = true;
+        const strong =
+          document.createElement("strong");
 
-    return;
+        strong.textContent =
+          piece.slice(2, -2);
+
+        parent.appendChild(strong);
+
+      } else {
+
+        parent.appendChild(
+          document.createTextNode(piece)
+        );
+      }
+    });
   }
 
-  document.getElementById("cropName").value =
-    data.crop_name || "";
+  lines.forEach((line) => {
 
-  document.getElementById("growthStage").value =
-    data.growth_stage || "";
+    const trimmed = line.trim();
 
-  document.getElementById("soilType").value =
-    data.soil_type || "";
+    if (!trimmed) {
+      closeList();
+      return;
+    }
 
-  document.getElementById("farmLocation").value =
-    data.farm_location || "";
+    if (/^---+$/.test(trimmed)) {
 
-  document.getElementById("farmSize").value =
-    data.farm_size ?? "";
+      closeList();
 
-  document.getElementById("farmSizeUnit").value =
-    data.farm_size_unit || "acres";
+      const divider =
+        document.createElement("hr");
 
-  displayProfileSummary(data);
+      divider.style.opacity = ".2";
+      divider.style.margin = "14px 0";
 
-  setProfileStatus(
-    "Farm profile loaded successfully.",
-    "success"
-  );
-
-  saveProfileBtn.textContent = "UPDATE CROP PROFILE";
-
-  saveProfileBtn.disabled = false;
-
-  profileReady = true;
-}
-
-/* =====================================
-   14. SAVE FARM PROFILE
-===================================== */
-
-farmProfileForm.addEventListener("submit", async (event) => {
-
-  event.preventDefault();
-
-  if (!backendReady || !profileReady) {
-
-    setProfileStatus(
-      "Please wait for the backend connection.",
-      "error"
-    );
-
-    return;
-  }
-
-  const cropName =
-    document.getElementById("cropName").value.trim();
-
-  const growthStage =
-    document.getElementById("growthStage").value;
-
-  const soilType =
-    document.getElementById("soilType").value;
-
-  const farmLocation =
-    document.getElementById("farmLocation").value.trim();
-
-  const farmSizeInput =
-    document.getElementById("farmSize").value;
-
-  const farmSizeUnit =
-    document.getElementById("farmSizeUnit").value;
-
-  if (!cropName || !growthStage || !soilType) {
-
-    setProfileStatus(
-      "Please complete all required fields.",
-      "error"
-    );
-
-    return;
-  }
-
-  let farmSize = null;
-
-  if (farmSizeInput !== "") {
-
-    farmSize = Number(farmSizeInput);
-
-    if (!Number.isFinite(farmSize) || farmSize < 0) {
-
-      setProfileStatus(
-        "Please enter a valid farm size.",
-        "error"
-      );
+      container.appendChild(divider);
 
       return;
     }
+
+    if (trimmed.startsWith("### ")) {
+
+      closeList();
+
+      const heading =
+        document.createElement("h4");
+
+      heading.textContent =
+        trimmed.slice(4);
+
+      container.appendChild(heading);
+
+      return;
+    }
+
+    if (trimmed.startsWith("## ")) {
+
+      closeList();
+
+      const heading =
+        document.createElement("h4");
+
+      heading.textContent =
+        trimmed.slice(3);
+
+      container.appendChild(heading);
+
+      return;
+    }
+
+    if (trimmed.startsWith("# ")) {
+
+      closeList();
+
+      const heading =
+        document.createElement("h4");
+
+      heading.textContent =
+        trimmed.slice(2);
+
+      container.appendChild(heading);
+
+      return;
+    }
+
+    if (/^[-*]\s+/.test(trimmed)) {
+
+      if (!currentList) {
+
+        currentList =
+          document.createElement("ul");
+
+        container.appendChild(currentList);
+      }
+
+      const item =
+        document.createElement("li");
+
+      appendFormattedText(
+        item,
+        trimmed.replace(/^[-*]\s+/, "")
+      );
+
+      currentList.appendChild(item);
+
+      return;
+    }
+
+    closeList();
+
+    const paragraph =
+      document.createElement("p");
+
+    appendFormattedText(
+      paragraph,
+      trimmed
+    );
+
+    container.appendChild(paragraph);
+  });
+}
+
+/* =====================================
+   14. DISPLAY AI PROFILE AND RESULTS
+===================================== */
+
+function displayAIResponse(data) {
+
+  const profile =
+    data.farmProfile || {};
+
+  const reading =
+    data.latestReading || {};
+
+  updateFarmProfileDisplay(profile);
+
+  updateAIOverview(reading);
+
+  setText(
+    "aiReadingsCount",
+    data.readingsAnalyzed == null
+      ? "--"
+      : `${data.readingsAnalyzed} readings`
+  );
+
+  formatAIAnalysis(data.analysis);
+
+  const generatedDate =
+    data.generatedAt
+      ? new Date(data.generatedAt)
+      : new Date();
+
+  setText(
+    "aiGeneratedAt",
+    "Generated: " + generatedDate.toLocaleString()
+  );
+
+  setText(
+    "aiModelUsed",
+    "Model: " + (data.modelUsed || "Gemini AI")
+  );
+
+  setText(
+    "aiModelStatus",
+    data.modelUsed || "Gemini AI"
+  );
+
+  showElement("aiResults", true);
+}
+
+/* =====================================
+   15. AI ANALYSIS REQUEST
+===================================== */
+
+async function generateFarmAnalysis(forceRefresh = false) {
+
+  if (aiRequestInProgress) {
+    return;
   }
 
-  const profile = {
+  if (!backendReady || !db) {
 
-    id: 1,
+    showElement("aiError", true);
 
-    crop_name: cropName,
+    setText(
+      "aiErrorText",
+      "The Supabase connection is not ready. Please reload the dashboard."
+    );
 
-    growth_stage: growthStage,
+    return;
+  }
 
-    soil_type: soilType,
+  const now = Date.now();
 
-    farm_location: farmLocation || null,
+  // Reuse a recent successful report if requested again
+  // within the short cache period.
+  if (
+    !forceRefresh &&
+    lastAIAnalysis &&
+    now - lastAIAnalysisTime < AI_CACHE_DURATION
+  ) {
 
-    farm_size: farmSize,
+    displayAIResponse(lastAIAnalysis);
 
-    farm_size_unit: farmSizeUnit,
+    setText(
+      "aiConnectionStatus",
+      "Showing recent analysis"
+    );
 
-    updated_at: new Date().toISOString()
-  };
+    setText(
+      "aiRefreshNote",
+      "Showing a recent report. Wait briefly or refresh the analysis when the cache period expires."
+    );
 
-  saveProfileBtn.disabled = true;
+    return;
+  }
 
-  saveProfileBtn.textContent = "SAVING...";
+  // Prevent rapid repeated API requests.
+  if (
+    lastAIRequestTime &&
+    now - lastAIRequestTime < AI_MIN_REQUEST_INTERVAL
+  ) {
 
-  setProfileStatus(
-    "Saving your farm profile..."
+    const secondsLeft = Math.ceil(
+      (
+        AI_MIN_REQUEST_INTERVAL -
+        (now - lastAIRequestTime)
+      ) / 1000
+    );
+
+    showElement("aiError", true);
+
+    setText(
+      "aiErrorText",
+      `Please wait ${secondsLeft} seconds before requesting another analysis.`
+    );
+
+    return;
+  }
+
+  aiRequestInProgress = true;
+
+  lastAIRequestTime = now;
+
+  const button =
+    document.getElementById(
+      "generateAIButton"
+    );
+
+  button.disabled = true;
+
+  setText(
+    "aiButtonText",
+    "Analyzing..."
+  );
+
+  setText(
+    "aiConnectionStatus",
+    "Connecting to Gemini AI..."
+  );
+
+  showElement("aiError", false);
+  showElement("aiLoading", true);
+  showElement("aiResults", false);
+
+  setText(
+    "aiRefreshNote",
+    "Please wait while the AI service processes your farm data."
   );
 
   try {
 
-    const { data, error } = await db
-      .from("farm_profile")
-      .upsert(profile, {
-        onConflict: "id"
-      })
-      .select()
-      .single();
+    // Call the deployed Supabase Edge Function.
+    // The Gemini API key remains on the server.
 
-    if (error) throw error;
+    const { data, error } =
+      await db.functions.invoke(
+        "crop-ai",
+        {
+          body: {}
+        }
+      );
 
-    displayProfileSummary(data);
+    if (error) {
 
-    setProfileStatus(
-      "Farm profile saved successfully!",
-      "success"
+      const serverMessage =
+        data?.details ||
+        data?.error ||
+        error.message;
+
+      throw new Error(
+        serverMessage ||
+        "Could not contact the AI service."
+      );
+    }
+
+    if (
+      !data ||
+      data.success !== true ||
+      !data.analysis
+    ) {
+
+      throw new Error(
+        data?.details ||
+        data?.error ||
+        "The AI service returned an invalid response."
+      );
+    }
+
+    lastAIAnalysis = data;
+    lastAIAnalysisTime = Date.now();
+
+    displayAIResponse(data);
+
+    setText(
+      "aiConnectionStatus",
+      "Farm analysis completed successfully"
     );
 
-    saveProfileBtn.textContent = "UPDATE CROP PROFILE";
+    setText(
+      "aiRefreshNote",
+      "Your latest successful analysis is displayed below."
+    );
+
+    showElement("aiLoading", false);
+    showElement("aiError", false);
+    showElement("aiResults", true);
+
+    // Move the report into view on smaller screens.
+    document.getElementById(
+      "aiResults"
+    ).scrollIntoView({
+      behavior: "smooth",
+      block: "nearest"
+    });
 
   } catch (error) {
 
-    console.error("Save profile:", error);
-
-    setProfileStatus(
-      "Could not save profile: " + error.message,
-      "error"
+    console.error(
+      "GREEN MILE AI error:",
+      error
     );
 
-    saveProfileBtn.textContent = "SAVE CROP PROFILE";
+    showElement("aiLoading", false);
+    showElement("aiError", true);
+
+    setText(
+      "aiConnectionStatus",
+      "AI service temporarily unavailable"
+    );
+
+    setText(
+      "aiErrorText",
+      error.message ||
+      "Unable to analyze your farm. Please try again."
+    );
+
+    setText(
+      "aiRefreshNote",
+      "Check your internet connection and the crop-ai Edge Function."
+    );
 
   } finally {
 
-    saveProfileBtn.disabled = false;
+    aiRequestInProgress = false;
+
+    button.disabled = false;
+
+    setText(
+      "aiButtonText",
+      "Generate AI Analysis"
+    );
   }
-});
+}
 
 /* =====================================
-   15. INITIALIZE SUPABASE
+   16. AI BUTTON EVENT
+===================================== */
+
+document
+  .getElementById("generateAIButton")
+  .addEventListener(
+    "click",
+    () => generateFarmAnalysis(false)
+  );
+
+/* =====================================
+   17. INITIALIZE SUPABASE
 ===================================== */
 
 async function initialize() {
 
   const validConfig =
     SUPABASE_URL.startsWith("https://") &&
-    !SUPABASE_URL.includes("YOUR_SUPABASE") &&
-    SUPABASE_ANON_KEY.length > 20 &&
-    !SUPABASE_ANON_KEY.includes("YOUR_SUPABASE");
+    SUPABASE_ANON_KEY.length > 20;
 
   if (!validConfig) {
 
-    setText("backendStatus", "Not configured");
+    setText(
+      "backendStatus",
+      "Not configured"
+    );
 
     setText(
       "pumpMessage",
-      "Add your Supabase project URL and key."
+      "Check your Supabase URL and public anon key."
     );
 
     setDeviceStatus(false);
-
-    setProfileStatus(
-      "Supabase configuration is missing.",
-      "error"
-    );
 
     return;
   }
@@ -1521,17 +2237,18 @@ async function initialize() {
       "Check your internet connection and reload."
     );
 
-    setProfileStatus(
-      "Supabase library unavailable.",
-      "error"
-    );
-
     return;
   }
 
   db = window.supabase.createClient(
     SUPABASE_URL,
-    SUPABASE_ANON_KEY
+    SUPABASE_ANON_KEY,
+    {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      }
+    }
   );
 
   try {
@@ -1541,44 +2258,71 @@ async function initialize() {
       .select("id")
       .limit(1);
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
 
     backendReady = true;
 
-    setText("backendStatus", "Connected");
+    setText(
+      "backendStatus",
+      "Connected"
+    );
 
-    await loadLatestReading();
+    setText(
+      "aiConnectionStatus",
+      "AI system ready"
+    );
 
-    await loadHistory();
+    // Load dashboard data.
+    await Promise.all([
+      loadLatestReading(),
+      loadHistory(),
+      loadPumpCommand(),
+      loadFarmProfile()
+    ]);
 
-    await loadPumpCommand();
-
-    await loadFarmProfile();
-
+    // Start Realtime subscriptions.
     subscribeToReadings();
-
     subscribeToPumpControl();
 
-    setInterval(checkDeviceStatus, 5000);
+    // Check ESP32 freshness.
+    setInterval(
+      checkDeviceStatus,
+      5000
+    );
 
   } catch (error) {
 
     backendReady = false;
 
-    setText("backendStatus", "Connection failed");
+    setText(
+      "backendStatus",
+      "Connection failed"
+    );
 
-    setText("pumpMessage", error.message);
+    setText(
+      "pumpMessage",
+      error.message
+    );
+
+    setText(
+      "aiConnectionStatus",
+      "Backend connection unavailable"
+    );
 
     setDeviceStatus(false);
 
-    setProfileStatus(
-      "Backend connection failed: " + error.message,
-      "error"
+    console.error(
+      "Supabase initialization:",
+      error
     );
-
-    console.error("Supabase connection:", error);
   }
 }
+
+/* =====================================
+   18. START APPLICATION
+===================================== */
 
 initialize();
 
