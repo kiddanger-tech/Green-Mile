@@ -658,7 +658,28 @@ th {
   color: #173d29;
 }
 
-.ai-report-footer {
+.ai-report-
+/* ESP32-CAM connection settings */
+.camera-settings-card{margin-top:24px}
+.camera-settings-card h3{margin:7px 0 9px}
+.camera-intro,.camera-help{color:var(--muted);font-size:13px;line-height:1.65;margin-bottom:15px}
+.camera-settings-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:end}
+.camera-field label{display:block;margin-bottom:8px;font-size:13px;font-weight:700}
+.camera-field input{width:100%;min-height:45px;padding:11px 13px;border:1px solid var(--border);border-radius:9px;font:inherit;color:var(--text);background:#fff}
+.camera-field input:focus{outline:2px solid rgba(23,107,67,.18);border-color:var(--green)}
+.camera-actions{display:flex;flex-wrap:wrap;gap:9px}
+.camera-button{min-height:44px;padding:11px 15px;border:0;border-radius:9px;background:var(--green);color:#fff;font-weight:700}
+.camera-button.secondary{background:#eaf2ec;color:var(--dark)}
+.camera-button:disabled{opacity:.55;cursor:wait}
+.camera-status{margin-top:14px;padding:12px 14px;border-radius:9px;background:#f5f8f5;color:var(--muted);font-size:13px;line-height:1.55;overflow-wrap:anywhere}
+.camera-status.success{background:#eaf7ee;color:#176b43}
+.camera-status.error{background:#fff0f0;color:#b83232}
+.camera-help{margin:13px 0 0;font-size:12px}
+.camera-link{display:inline-block;margin-top:12px;color:var(--green);font-size:13px;font-weight:700;text-decoration:none}
+.camera-link[hidden]{display:none}
+@media(max-width:650px){.camera-settings-grid{grid-template-columns:1fr}.camera-actions{display:grid;grid-template-columns:1fr 1fr}}
+
+footer {
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -1081,6 +1102,50 @@ footer {
       Verify field conditions and sensor accuracy before irrigation.
     </div>
 
+  </section>
+
+
+  <!-- ESP32-CAM CONNECTION SETTINGS -->
+  <section class="card camera-settings-card" id="cameraSettings">
+    <div class="card-top">
+      <div>
+        <div class="card-label">Camera Configuration</div>
+        <h3>ESP32-CAM Connection Settings</h3>
+      </div>
+      <div class="card-icon water-icon">📷</div>
+    </div>
+    <p class="camera-intro">
+      Enter the current local IP address shown in the ESP32-CAM Serial Monitor.
+      You can update it whenever your router assigns the camera a different address.
+    </p>
+    <div class="camera-settings-grid">
+      <div class="camera-field">
+        <label for="cameraIpInput">Camera IP Address</label>
+        <input id="cameraIpInput" type="text" inputmode="decimal"
+          autocomplete="off" spellcheck="false" placeholder="Example: 192.168.1.105">
+      </div>
+      <div class="camera-actions">
+        <button class="camera-button" id="saveCameraIpButton" type="button">Save Address</button>
+        <button class="camera-button secondary" id="testCameraButton" type="button">Test Connection</button>
+      </div>
+    </div>
+    <div class="camera-status" id="cameraConnectionStatus" role="status" aria-live="polite">
+      No camera address saved yet.
+    </div>
+    <a class="camera-link" id="openCameraStream" href="#" target="_blank"
+      rel="noopener noreferrer" hidden>Open camera stream ↗</a>
+    <p class="camera-help">
+      To find the address, open Arduino IDE Serial Monitor at 115200 baud and reset
+      the ESP32-CAM. Look for the IP address printed after Wi-Fi connects.
+      The farmer's phone or computer must be on the same Wi-Fi network as the camera.
+      The saved address is stored in this browser on this device.
+    </p>
+    <p class="camera-help">
+      This Netlify dashboard uses HTTPS, while the usual ESP32-CAM stream uses HTTP.
+      Modern browsers may block direct tests or embedded streams because of
+      mixed-content and cross-origin restrictions. A failed browser test does not
+      always mean the camera is offline.
+    </p>
   </section>
 
   <!-- SENSOR HISTORY -->
@@ -2198,6 +2263,127 @@ document
     () => generateFarmAnalysis(false)
   );
 
+
+/* ESP32-CAM IP ADDRESS SETTINGS */
+const CAMERA_IP_STORAGE_KEY = "greenMileEsp32CamIp";
+
+function isValidIPv4(value) {
+  const parts = value.trim().split(".");
+  return parts.length === 4 && parts.every(part =>
+    /^\d{1,3}$/.test(part) && Number(part) >= 0 && Number(part) <= 255
+  );
+}
+
+function setCameraStatus(message, type = "") {
+  const status = document.getElementById("cameraConnectionStatus");
+  if (!status) return;
+  status.textContent = message;
+  status.className = "camera-status" + (type ? " " + type : "");
+}
+
+function updateCameraStreamLink(ip) {
+  const link = document.getElementById("openCameraStream");
+  if (!link) return;
+  if (!ip) {
+    link.hidden = true;
+    link.removeAttribute("href");
+    return;
+  }
+  // Standard Espressif CameraWebServer stream endpoint.
+  link.href = "http://" + ip + ":81/stream";
+  link.hidden = false;
+}
+
+function saveCameraAddress() {
+  const input = document.getElementById("cameraIpInput");
+  const ip = input.value.trim();
+  if (!isValidIPv4(ip)) {
+    setCameraStatus("Enter a valid IPv4 address, for example 192.168.1.105.", "error");
+    input.focus();
+    return;
+  }
+  try {
+    localStorage.setItem(CAMERA_IP_STORAGE_KEY, ip);
+  } catch (error) {
+    setCameraStatus("The browser could not save this address. Check browser storage settings.", "error");
+    return;
+  }
+  updateCameraStreamLink(ip);
+  setCameraStatus("Camera address saved: " + ip + ". Use Test Connection to check whether it can be reached on this network.", "success");
+}
+
+async function testCameraConnection() {
+  const input = document.getElementById("cameraIpInput");
+  const button = document.getElementById("testCameraButton");
+  const ip = input.value.trim();
+
+  if (!isValidIPv4(ip)) {
+    setCameraStatus("Enter a valid camera IPv4 address before testing.", "error");
+    input.focus();
+    return;
+  }
+
+  try {
+    localStorage.setItem(CAMERA_IP_STORAGE_KEY, ip);
+  } catch (error) {
+    setCameraStatus("Browser storage is unavailable; attempting the test without saving.");
+  }
+
+  updateCameraStreamLink(ip);
+  button.disabled = true;
+  button.textContent = "Testing...";
+  setCameraStatus("Trying to reach http://" + ip + "/. Keep this device on the same Wi-Fi network as the ESP32-CAM.");
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+  try {
+    // A no-cors response is opaque: this only checks that a request was sent,
+    // it cannot verify the HTTP status or prove that the video stream works.
+    await fetch("http://" + ip + "/", {
+      method: "GET", mode: "no-cors", cache: "no-store", signal: controller.signal
+    });
+    setCameraStatus(
+      "The browser sent a request to " + ip + ". This basic no-cors test cannot verify the camera response. Select Open camera stream to check the live feed.",
+      "success"
+    );
+  } catch (error) {
+    const reason = error.name === "AbortError"
+      ? "The request timed out after 5 seconds."
+      : "The browser could not reach the camera. It may be offline, on another Wi-Fi network, or blocked by browser security.";
+    setCameraStatus(reason + " Check the IP address and Wi-Fi connection, then try again.", "error");
+  } finally {
+    clearTimeout(timeoutId);
+    button.disabled = false;
+    button.textContent = "Test Connection";
+  }
+}
+
+function initializeCameraSettings() {
+  const input = document.getElementById("cameraIpInput");
+  const saveButton = document.getElementById("saveCameraIpButton");
+  const testButton = document.getElementById("testCameraButton");
+  if (!input || !saveButton || !testButton) return;
+
+  try {
+    const savedIp = localStorage.getItem(CAMERA_IP_STORAGE_KEY);
+    if (savedIp && isValidIPv4(savedIp)) {
+      input.value = savedIp;
+      updateCameraStreamLink(savedIp);
+      setCameraStatus("Saved camera address: " + savedIp + ". If the router has changed it, enter the new address and select Save Address.");
+    }
+  } catch (error) {
+    setCameraStatus("Browser storage is unavailable. You can still enter an address for this session.", "error");
+  }
+
+  saveButton.addEventListener("click", saveCameraAddress);
+  testButton.addEventListener("click", testCameraConnection);
+  input.addEventListener("keydown", event => {
+    if (event.key === "Enter") saveCameraAddress();
+  });
+}
+
+
 /* =====================================
    17. INITIALIZE SUPABASE
 ===================================== */
@@ -2325,6 +2511,7 @@ async function initialize() {
 ===================================== */
 
 initialize();
+initializeCameraSettings();
 
 </script>
 
